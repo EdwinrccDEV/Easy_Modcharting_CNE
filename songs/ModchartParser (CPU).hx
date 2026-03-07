@@ -30,10 +30,22 @@ function setupModchart() {
 
         var evtStartBeat = event.startStep != null ? event.startStep / 4 : event.startBeat;
         var evtEndBeat = event.endStep != null ? event.endStep / 4 : event.endBeat;
+        var easeFunc = CoolUtil.flxeaseFromString(event.ease, event.easeDir);
 
-        if (evtEndBeat != null) {
+        if (event.endValue != null) {
+            // snap to value then tween to endValue
+            var mod = event.modifier;
+            var val = event.value;
+            var endVal = event.endValue;
+            callback(evtStartBeat, function() {
+                setValue(mod, val);
+            });
+            if (evtEndBeat != null) {
+                var duration = evtEndBeat - evtStartBeat;
+                ease(mod, evtStartBeat, duration, endVal, easeFunc);
+            }
+        } else if (evtEndBeat != null) {
             var duration = evtEndBeat - evtStartBeat;
-            var easeFunc = CoolUtil.flxeaseFromString(event.ease, event.easeDir);
             ease(event.modifier, evtStartBeat, duration, event.value, easeFunc);
         } else {
             var mod = event.modifier;
