@@ -70,10 +70,18 @@ public function setupFromJson(data:Dynamic) {
         var evtStartBeat:Float = event.startStep != null ? event.startStep / 4 : event.startBeat;
         var evtEndBeat = event.endStep != null ? event.endStep / 4 : event.endBeat;
 
-        if (evtEndBeat != null) {
+        var easeDir:String = event.easeDir != null ? event.easeDir.charAt(0).toUpperCase() + event.easeDir.substr(1) : "";
+        var easeName:String = event.ease != null ? event.ease + easeDir : "linear";
+
+        if (event.endValue != null) {
+            // snap to value then tween to endValue
+            set(evtStartBeat, event.value + ", " + event.modifier);
+            if (evtEndBeat != null) {
+                var duration:Float = evtEndBeat - evtStartBeat;
+                ease(evtStartBeat, duration, easeName, event.endValue + ", " + event.modifier);
+            }
+        } else if (evtEndBeat != null) {
             var duration:Float = evtEndBeat - evtStartBeat;
-            var easeDir:String = event.easeDir != null ? event.easeDir.charAt(0).toUpperCase() + event.easeDir.substr(1) : "";
-            var easeName:String = event.ease != null ? event.ease + easeDir : "linear";
             ease(evtStartBeat, duration, easeName, event.value + ", " + event.modifier);
         } else {
             set(evtStartBeat, event.value + ", " + event.modifier);
