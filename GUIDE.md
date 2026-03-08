@@ -80,7 +80,7 @@ Snaps to `value` instantly at `startBeat`, then immediately starts tweening to `
 
 This is useful for effects that need to start at a specific value and then animate back. For example: snap to full rotation then bounce back to 0. Without `endValue` you would need two separate events to achieve the same result.
 
-### Repeater
+### Repeater (GPU ONLY)
 Repeats an event automatically every X beats or steps. Instead of writing the same event dozens of times, you write it once and tell it how many times to repeat.
 
 ```json
