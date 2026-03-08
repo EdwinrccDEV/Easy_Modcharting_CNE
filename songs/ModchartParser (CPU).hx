@@ -26,6 +26,35 @@ function setupModchart() {
         return;
 
     for (event in cast(data.modchart, Array<Dynamic>)) {
+
+        // handle repeater
+        if (event.repeater != null) {
+            var r = event.repeater;
+            var step:Float = r.each == "step" ? r.every / 4 : r.every;
+            var startBeat:Float = r.startStep != null ? r.startStep / 4 : (r.startBeat != null ? r.startBeat : 0.0);
+            var easeFunc = CoolUtil.flxeaseFromString(r.ease, r.easeDir);
+            var mod:String = r.modifier;
+            var val:Float = r.value;
+
+            addMod(mod);
+
+            var i = 0;
+            while (i < r.during) {
+                var b:Float = startBeat + (i * step);
+                var v:Float = val;
+                callback(b, function() { setValue(mod, v); });
+                if (r.endValue != null) {
+                    var dur:Float = r.durationStep != null ? r.durationStep / 4 : r.duration;
+                    if (dur != null) {
+                        ease(b, dur, easeName, r.endValue + ", " + r.modifier);
+                    }
+                }
+                i++;
+            }
+            continue;
+        }
+
+        // handle normal events
         addMod(event.modifier);
 
         var evtStartBeat = event.startStep != null ? event.startStep / 4 : event.startBeat;
@@ -33,13 +62,10 @@ function setupModchart() {
         var easeFunc = CoolUtil.flxeaseFromString(event.ease, event.easeDir);
 
         if (event.endValue != null) {
-            // snap to value then tween to endValue
             var mod = event.modifier;
             var val = event.value;
             var endVal = event.endValue;
-            callback(evtStartBeat, function() {
-                setValue(mod, val);
-            });
+            callback(evtStartBeat, function() { setValue(mod, val); });
             if (evtEndBeat != null) {
                 var duration = evtEndBeat - evtStartBeat;
                 ease(mod, evtStartBeat, duration, endVal, easeFunc);
@@ -50,9 +76,7 @@ function setupModchart() {
         } else {
             var mod = event.modifier;
             var val = event.value;
-            callback(evtStartBeat, function() {
-                setValue(mod, val);
-            });
+            callback(evtStartBeat, function() { setValue(mod, val); });
         }
     }
 }
