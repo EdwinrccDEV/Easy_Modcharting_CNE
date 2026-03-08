@@ -1,0 +1,16 @@
+{
+  "modchart": [
+    { "modifier": "angleX", "value": -45, "startBeat": 4, "endBeat": 8, "ease": "cube", "easeDir": "Out" },
+    { "modifier": "drunk", "value": 1, "startBeat": 8, "endBeat": 12, "ease": "elastic", "easeDir": "Out" },
+    { "modifier": "MoveYWaveShit", "value": 1, "startBeat": 12, "endBeat": 16, "ease": "elastic", "easeDir": "Out" },
+    { "modifier": "angleZ", "value": 360, "endValue": 0, "startBeat": 16, "endBeat": 20, "ease": "bounce", "easeDir": "Out" },
+    { "modifier": "reverseP1", "value": 1, "startBeat": 20, "endBeat": 22, "ease": "back", "easeDir": "Out" },
+    { "modifier": "reverseP2", "value": 1, "startBeat": 22, "endBeat": 24, "ease": "back", "easeDir": "Out" },
+    { "repeater": { "modifier": "flash", "value": 1, "endValue": 0, "duration": 0.5, "every": 1, "each": "beat", "during": 8, "startBeat": 24 } },
+    { "modifier": "angleX", "value": 0, "startBeat": 32, "endBeat": 36, "ease": "bounce", "easeDir": "Out" },
+    { "modifier": "drunk", "value": 0, "startBeat": 32, "endBeat": 36, "ease": "expo", "easeDir": "In" },
+    { "modifier": "MoveYWaveShit", "value": 0, "startBeat": 32, "endBeat": 36, "ease": "expo", "easeDir": "In" },
+    { "modifier": "reverseP1", "value": 0, "startBeat": 32, "endBeat": 36, "ease": "cube", "easeDir": "InOut" },
+    { "modifier": "reverseP2", "value": 0, "startBeat": 32, "endBeat": 36, "ease": "cube", "easeDir": "InOut" }
+  ]
+}
