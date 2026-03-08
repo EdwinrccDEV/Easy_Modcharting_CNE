@@ -27,33 +27,6 @@ function setupModchart() {
 
     for (event in cast(data.modchart, Array<Dynamic>)) {
 
-        // handle repeater
-        if (event.repeater != null) {
-            var r = event.repeater;
-            var step:Float = r.each == "step" ? r.every / 4 : r.every;
-            var startBeat:Float = r.startStep != null ? r.startStep / 4 : (r.startBeat != null ? r.startBeat : 0.0);
-            var easeFunc = CoolUtil.flxeaseFromString(r.ease, r.easeDir);
-            var mod:String = r.modifier;
-            var val:Float = r.value;
-
-            addMod(mod);
-
-            var i = 0;
-            while (i < r.during) {
-                var b:Float = startBeat + (i * step);
-                var v:Float = val;
-                callback(b, function() { setValue(mod, v); });
-                if (r.endValue != null) {
-                    var dur:Float = r.durationStep != null ? r.durationStep / 4 : r.duration;
-                    if (dur != null) {
-                        ease(b, dur, easeName, r.endValue + ", " + r.modifier);
-                    }
-                }
-                i++;
-            }
-            continue;
-        }
-
         // handle normal events
         addMod(event.modifier);
 
