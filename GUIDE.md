@@ -248,4 +248,4 @@ Full list: https://github.com/theoo-h/FunkinModchart/tree/main/modchart/engine/m
 
 ---
 
-*Easy Modcharting by Edwin — Credits: TheZoroForce240 (GPU Framework), _theodev (CPU Framework)*
+*Easy Modcharting by Edwin — Credits: TheZoroForce240 (GPU Framework), _theodev or Srt (idk) (CPU Framework)*
