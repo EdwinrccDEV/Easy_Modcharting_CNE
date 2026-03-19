@@ -20,10 +20,12 @@ function postCreate() {
 
 function setupModchart() {
     var songName = PlayState.SONG.meta.name.toLowerCase();
-    var data = CoolUtil.parseJson('assets/songs/' + songName + '/modchart (CPU).json');
-
-    if (data == null)
-        return;
+    var path = 'assets/songs/' + songName + '/modchart (CPU).json';
+    if (!Assets.exists(path)) return;
+    var content = Assets.getText(path);
+    if (content == null || StringTools.trim(content) == '') return;
+    var data = CoolUtil.parseJson(path);
+    if (data == null) return;
 
     for (event in cast(data.modchart, Array<Dynamic>)) {
 
