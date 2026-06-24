@@ -29,7 +29,6 @@ function setupModchart() {
 
     for (event in cast(data.modchart, Array<Dynamic>)) {
 
-        // handle normal events
         addMod(event.modifier);
 
         var evtStartBeat = event.startStep != null ? event.startStep / 4 : event.startBeat;
