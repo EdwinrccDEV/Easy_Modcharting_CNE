@@ -130,7 +130,19 @@ After that, the sub-modifiers work normally:
 { "modifier": "centerRotateX", "value": 360, "startBeat": 2, "endBeat": 32, "ease": "sine", "easeDir": "InOut" }
 ```
 
-Loader entries must use parent names (`rotate`, `centerRotate`, …), never the `X`/`Y`/`Z` variants. The GPU side ignores `loader` entries — GPU modifiers are all flat and self-registering.
+Loader entries must use parent names (`rotate`, `centerRotate`, …), never the `X`/`Y`/`Z` variants. Two parents use flat key names: `transform` drives `x` / `y` / `z` (plus `xoffset` / `yoffset` / `zoffset`), and `scale` drives `scaleX` / `scaleY`:
+
+```json
+{ "loader": "transform" }
+{ "modifier": "x", "value": 200, "startBeat": 64, "endBeat": 68, "ease": "cube", "easeDir": "InOut" }
+```
+
+```json
+{ "loader": "scale" }
+{ "modifier": "scaleX", "value": 1.5, "startBeat": 64, "endBeat": 68, "ease": "elastic", "easeDir": "Out" }
+```
+
+The GPU side ignores `loader` entries — GPU modifiers are all flat and self-registering.
 
 
 ---
