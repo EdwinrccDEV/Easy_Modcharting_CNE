@@ -122,12 +122,47 @@ function getLoaderNames(raw:Dynamic):Array<String> {
     return names;
 }
 
-// True when "name" is (or extends) an already-loaded parent modifier,
+// True when "name" is a percent key read by an already-loaded parent modifier,
 // e.g. "centerRotateX" with parent "centerRotate" loaded.
+// Most parents use prefixed keys (prefix match), but some use flat keys:
+// - "transform" reads x/y/z/xoffset/yoffset/zoffset (+ lane variants like x0)
+// - "stealth" reads alpha/sudden/hidden/dark (+ stealth/dark + lane variants)
+// - "scale" reads scale/scaleX/scaleY/tiny/tinyX/tinyY (+ lane variants)
+// - "zoom" reads zoom/mini/localZoom/localMini
+// - "confusion" reads confusion/confusionOffset/roll/twirl/dizzy (+ axis/lane variants)
+// - "beat" reads beat/beatX/beatY/beatZ (+ Speed/Offset/Mult variants)
 function isSubOfLoadedParent(name:Dynamic, parents:Array<String>):Bool {
     var low = Std.string(name).toLowerCase();
     for (p in parents) {
         if (low == p || StringTools.startsWith(low, p)) return true;
+        if (p == "transform") {
+            if (low == "x" || low == "y" || low == "z" || low == "xoffset" || low == "yoffset" || low == "zoffset") return true;
+            // Lane variants like x0, y2, xoffset1
+            if ((low.charAt(0) == "x" || low.charAt(0) == "y" || low.charAt(0) == "z") && low.length > 1) {
+                var rest = low.substr(1);
+                // x0 / y2 / z3
+                if (rest.charAt(0) >= "0" && rest.charAt(0) <= "9") return true;
+                // xoffset0 ...
+                if (StringTools.startsWith(rest, "offset")) return true;
+            }
+        }
+        if (p == "stealth") {
+            if (low == "alpha" || low == "dark" || low == "stealth" || StringTools.startsWith(low, "sudden") || StringTools.startsWith(low, "hidden")) return true;
+            // Lane variants like alpha0, stealth2, dark1
+            if ((StringTools.startsWith(low, "alpha") || StringTools.startsWith(low, "stealth") || StringTools.startsWith(low, "dark")) && low.length > 5) return true;
+        }
+        if (p == "scale") {
+            if (StringTools.startsWith(low, "scale") || StringTools.startsWith(low, "tiny")) return true;
+        }
+        if (p == "zoom") {
+            if (low == "zoom" || low == "mini" || low == "localzoom" || low == "localmini") return true;
+        }
+        if (p == "confusion") {
+            if (StringTools.startsWith(low, "confusion") || StringTools.startsWith(low, "roll") || StringTools.startsWith(low, "twirl") || StringTools.startsWith(low, "dizzy")) return true;
+        }
+        if (p == "beat") {
+            if (StringTools.startsWith(low, "beat")) return true;
+        }
     }
     return false;
 }
