@@ -22,14 +22,35 @@ A tween is a smooth transition from one value to another over a period of time. 
 
 ## File Structure
 
-Place your JSON files inside your song folder:
+Place your JSON files inside your song folder — either in the base game or inside a mod (both are found automatically):
 
 ```
 assets/songs/yourSongName/modchart (CPU).json
 assets/songs/yourSongName/modchart (GPU).json
+mods/YourMod/songs/yourSongName/modchart (CPU).json
+mods/YourMod/songs/yourSongName/modchart (GPU).json
 ```
 
 You can use just CPU, just GPU, or both at the same time. Each one is completely independent.
+
+### Per-difficulty and per-variation files
+
+You can target specific difficulties or song variations (e.g. `erect`, `pico`) by adding a suffix to the file name. The parser tries them in this order and uses the first one it finds:
+
+```
+modchart (GPU)-hard-erect.json   <- exact difficulty + variation (most specific)
+modchart (GPU)-any-erect.json    <- any difficulty, but only the erect variation
+modchart (GPU)-hard.json         <- only the hard difficulty
+modchart (GPU).json              <- generic fallback for everything else
+```
+
+The same pattern works for `(CPU)`. Difficulty names come from the song's `meta.json` (`easy`, `normal`, `hard`, or custom ones). The `default` variation uses the generic/difficulty files; `any` is a wildcard that matches every difficulty.
+
+Example setup: a gentle modchart in `modchart (GPU).json`, an intense one in `modchart (GPU)-hard.json`, and one synced to alternate charts in `modchart (GPU)-any-erect.json`.
+
+### Missing or broken files
+
+A song without a modchart file is not an error — the parser silently skips it. An empty file, a file without the `"modchart"` field, or invalid JSON is also ignored safely: you will only see a warning in the console and the song keeps playing.
 
 ---
 
@@ -95,15 +116,22 @@ With steps:
 { "repeater": { "modifier": "flash", "value": 1, "endValue": 0, "durationStep": 2, "every": 4, "each": "step", "during": 8, "startStep": 16 } }
 ```
 
-To repeat multiple modifiers at the same time, just add multiple repeater entries:
+### Loader (CPU ONLY)
+Some CPU modifiers are groups with sub-modifiers — for example `rotateX`, `centerRotateZ` or `localRotateY` only work when their parent (`rotate`, `centerRotate`, `localRotate`) is loaded. A plain `{ "modifier": "centerRotateX", ... }` event only sets a value key, so without the parent it silently does nothing. Preload the parent with a `loader` entry (a single name or an array):
+
 ```json
-{
-  "modchart": [
-    { "repeater": { "modifier": "flash", "value": 1, "endValue": 0, "duration": 0.5, "every": 1, "each": "beat", "during": 8, "startBeat": 4 } },
-    { "repeater": { "modifier": "drunk", "value": 1, "endValue": 0, "duration": 0.5, "every": 1, "each": "beat", "during": 8, "startBeat": 4 } }
-  ]
-}
+{ "loader": "centerRotate" }
+{ "loader": ["rotate", "localRotate", "fieldRotate"] }
 ```
+
+After that, the sub-modifiers work normally:
+
+```json
+{ "modifier": "centerRotateX", "value": 360, "startBeat": 2, "endBeat": 32, "ease": "sine", "easeDir": "InOut" }
+```
+
+Loader entries must use parent names (`rotate`, `centerRotate`, …), never the `X`/`Y`/`Z` variants. The GPU side ignores `loader` entries — GPU modifiers are all flat and self-registering.
+
 
 ---
 

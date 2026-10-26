@@ -5,7 +5,7 @@ import haxe.Timer;
 /*
 Modified Part by Edwin
 */
-varvar gpuModifierDefs = [
+var gpuModifierDefs = [
     { name: "drunk", value: 0.0, code: "x += cos(((songPosition*0.001) + (strumID*0.2) + (curPos*0.45)*0.013) * (10.0*0.2)) * 112.0*0.5 * drunk_value;" },
     { name: "drunkP1", value: 0.0, code: "x += cos(((songPosition*0.001) + (strumID*0.2) + (curPos*0.45)*0.013) * (2.0*0.2)) * 112.0*0.5 * drunkP1_value;", strumLine: 1 },
     { name: "drunkP2", value: 0.0, code: "x += cos(((songPosition*0.001) + (strumID*0.2) + (curPos*0.45)*0.013) * (2.0*0.2)) * 112.0*0.5 * drunkP2_value;", strumLine: 0 },
@@ -61,6 +61,7 @@ public function setupFromJson(data:Dynamic) {
     // register all unique modifiers first
     var registered:Array<String> = [];
     for (event in events) {
+        if (event == null || event.loader != null) continue; // CPU-only "loader" entries
         var name:String = event.repeater != null ? event.repeater.modifier : event.modifier;
         if (registered.indexOf(name) == -1) {
             registered.push(name);
@@ -81,6 +82,7 @@ public function setupFromJson(data:Dynamic) {
 
     // setup events
     for (event in events) {
+        if (event == null || event.loader != null) continue; // CPU-only "loader" entries
 
         // handle repeater
         if (event.repeater != null) {
@@ -140,9 +142,10 @@ var perspectiveMatrix:Array<Float> =
 [
     focalLength, 0, 0, 0,
 	0, focalLength, 0, 0,
-	0, 0, 1.0, 1.0,
+	0, 0, 0.0, 1.0,
 	0, 0, 0, 0
 ];
+
 var viewMatrix:Array<Float> = [];
 
 public var eye:Array<Float> = [0, 0, -0.71, 0];
@@ -204,9 +207,13 @@ function createPerspectiveShader(obj, strumLineID, strumID)
 	//shader.data.vertexXOffset.value = [0.0, 0.0, 0.0, 0.0];
 	//shader.data.vertexYOffset.value = [0.0, 0.0, 0.0, 0.0];
 	//shader.data.vertexZOffset.value = [0.0, 0.0, 0.0, 0.0];
-	shader.data.vertexID.value = [0, 1, 2, 3];
+	shader.data.vertexID.value = [0]; // single value: current cne-openfl requires the array to match the attribute size
 	shader.perspectiveMatrix = perspectiveMatrix;
 	shader.viewMatrix = viewMatrix;
+	if (shader.data.bitmap != null && obj.graphic != null && obj.graphic.bitmap != null) {
+		shader.data.bitmap.input = obj.graphic.bitmap;
+	} else {		trace('[EasyModchart] WARNING: could not bind bitmap input on the shader');
+	}
 	obj.shader = shader;
 }
 /////////////////////////////////////
@@ -296,9 +303,9 @@ function postUpdate(elapsed)
 			strum.shader.songPosition = Conductor.songPosition;
 			strum.shader.curBeat = Conductor.curBeatFloat;
 
-			strum.shader.strumID = strum.ID;
-			strum.shader.strumLineID = p.ID;
-			strum.shader.data.noteCurPos.value = [0.0, 0.0, 0.0, 0.0];
+			strum.shader.strumID = strum.ID * 1.0;
+			strum.shader.strumLineID = p.ID * 1.0;
+			strum.shader.data.noteCurPos.value = [0.0]; // single value (float): extra values make the engine treat it as a buffer and return garbage
 			strum.shader.scrollSpeed = 0.0;
 
 			if (strum.frame != null)
@@ -367,9 +374,9 @@ function postUpdate(elapsed)
 			point.put();
 
 			
-			n.shader.strumID = n.strumID;
-			n.shader.strumLineID = p.ID;
-			n.shader.data.noteCurPos.value = [curPos, curPos, nextCurPos, nextCurPos];
+			n.shader.strumID = n.strumID * 1.0;
+			n.shader.strumLineID = p.ID * 1.0;
+			n.shader.data.noteCurPos.value = [curPos]; // single value (float): the shader only reads noteCurPos as a float
 			n.shader.scrollSpeed = strumLines.members[p.ID].members[n.strumID].getScrollSpeed(n);
 			/*
 			for (mod in modTable[p.ID][n.strumID]) //update modifier values on shader

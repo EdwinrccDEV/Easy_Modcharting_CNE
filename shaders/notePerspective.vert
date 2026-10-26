@@ -3,11 +3,6 @@
 
 #define PI 3.14159265359
 
-attribute float alpha;
-attribute vec4 colorMultiplier;
-attribute vec4 colorOffset;
-uniform bool hasColorTransform;
-
 uniform bool downscroll;
 uniform bool isSustainNote;
 
@@ -91,13 +86,34 @@ void main(void)
 	}
 	
 
-    openfl_Alphav = openfl_Alpha;
-	openfl_TextureCoordv = openfl_TextureCoord;
-    openfl_Alphav = openfl_Alpha * alpha * a;
+    openfl_TextureCoordv = openfl_TextureCoord;
     if (hasColorTransform)
     {
-        openfl_ColorOffsetv = colorOffset / 255.0;
-        openfl_ColorMultiplierv = colorMultiplier;
+        openfl_Alphav = openfl_Alpha * colorMultiplier.a * a;
+        if (openfl_HasColorTransform)
+        {
+            openfl_ColorOffsetv = (openfl_ColorOffset / 255.0 * colorMultiplier) + (colorOffset / 255.0);
+            openfl_ColorMultiplierv = openfl_ColorMultiplier * vec4(colorMultiplier.rgb, 1.0);
+        }
+        else
+        {
+            openfl_ColorOffsetv = colorOffset / 255.0;
+            openfl_ColorMultiplierv = vec4(colorMultiplier.rgb, 1.0);
+        }
+    }
+    else
+    {
+        openfl_Alphav = openfl_Alpha * alpha * a;
+        if (openfl_HasColorTransform)
+        {
+            openfl_ColorOffsetv = (openfl_ColorOffset + colorOffset) / 255.0;
+            openfl_ColorMultiplierv = openfl_ColorMultiplier;
+        }
+        else
+        {
+            openfl_ColorOffsetv = colorOffset / 255.0;
+            openfl_ColorMultiplierv = vec4(1.0);
+        }
     }
 
 	vec4 pos = openfl_Position;
